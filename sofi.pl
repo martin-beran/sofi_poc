@@ -3,3 +3,4 @@
 :- module(sofi, []).
 
 :- reexport(integrity).
+:-reexport(entity).

@@ -18,6 +18,7 @@
     op(500, yfx, #+),
     op(400, yfx, #*),
     is_integrity/1,
+    make_integrity/3,
     integrity_min/1,
     integrity_max/1
 ]).
@@ -99,13 +100,20 @@ a_intersection(A, B, AB) :-
 
 is_integrity(integrity{ia:IA, ca:CA}) :- ia_list(IA), ca_list(CA).
 
-ia_list([]).
-ia_list([H|T]) :- atom(H), ia_list(T).
 ia_list(root).
+ia_list(L) :- is_list(L), list_to_ord_set(L, L).
 
-ca_list([]).
-ca_list([H|T]) :- atom(H), ca_list(T).
 ca_list(top_secret).
+ca_list(L) :- is_list(L), list_to_ord_set(L, L).
+
+make_integrity(IA, CA, integrity{ia:IL, ca:CL}) :-
+    make_ia_list(IA, IL), make_ca_list(CA, CL).
+
+make_ia_list(root, root).
+make_ia_list(IA, IL) :- is_list(IA), list_to_ord_set(IA, IL).
+
+make_ca_list(top_secret, top_secret).
+make_ca_list(CA, CL) :- is_list(CA), list_to_ord_set(CA, CL).
 
 integrity_min(integrity{ia:[], ca:top_secret}).
 
