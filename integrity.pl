@@ -17,13 +17,16 @@
     (#>)/2,
     op(500, yfx, #+),
     op(400, yfx, #*),
-    is_integrity/1,
+    check_integrity/1,
     make_integrity/3,
     integrity_min/1,
     integrity_max/1
 ]).
 
+:- use_module(util).
+
 I1 #== I2 :-
+    check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
     ia_eq(IA1, IA2), ca_eq(CA1, CA2).
 
@@ -38,10 +41,12 @@ eq(A, B) :-
     ord_seteq(OA, OB).
 
 I1 #\= I2 :-
+    check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:_, ca:_}, I2 = integrity{ia:_, ca:_},
     \+ I1 #== I2.
 
 I1 #=< I2 :-
+    check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
     ia_le(IA1, IA2), ca_le(CA1, CA2).
 
@@ -98,7 +103,9 @@ a_intersection(A, B, AB) :-
     is_list(A), is_list(B), list_to_ord_set(A, OA), list_to_ord_set(B, OB),
     ord_intersection(OA, OB, AB).
 
-is_integrity(integrity{ia:IA, ca:CA}) :- ia_list(IA), ca_list(CA).
+check_integrity(I) :-
+    check_(I = integrity{ia:IA, ca:CA}),
+    check_(ia_list(IA)), check_(ca_list(CA)).
 
 ia_list(root).
 ia_list(L) :- is_list(L), list_to_ord_set(L, L).
