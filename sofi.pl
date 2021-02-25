@@ -3,4 +3,6 @@
 :- module(sofi, []).
 
 :- reexport(integrity).
-:-reexport(entity).
+:- reexport(entity).
+:- reexport(operation).
+:- reexport(util).
