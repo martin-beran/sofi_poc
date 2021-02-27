@@ -47,6 +47,20 @@ f_execute(S1, O1, F, T, S2, O2, R) :-
     ),
     check_subject(S2), check_object(O2), check_f_result(R).
 
-update_r(S, _O, _F, S.i). % TODO
+update_r(S, O, F, I) :-
+    TCALL =.. [S.t, F, S.i, O.i, TI1], TCALL,
+    TI #:= S.i #* TI1,
+    PCALL =.. [O.p, F, O.i, S.i, PI1], PCALL,
+    PI #:= PI1 #* O.i,
+    RCALL =.. [S.r, F, S.i, PI, RI1], RCALL,
+    RI #:= RI1 #* PI,
+    I #:= TI #+ RI.
 
-update_w(S, _O, _F, S.w). % TODO
+update_w(S, O, F, I) :-
+    TCALL =.. [O.t, F, O.i, S.i, TI1], TCALL,
+    TI #:= O.i #* TI1,
+    PCALL =.. [S.p, F, S.i, O.i, PI1], PCALL,
+    PI #:= PI1 #* S.i,
+    RCALL =.. [O.p, F, O.i, PI, RI1], RCALL,
+    RI #:= RI1 #* PI,
+    I #:= TI #+ RI.

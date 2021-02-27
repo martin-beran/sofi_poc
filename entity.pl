@@ -23,11 +23,14 @@ check_entity(entity{i:I, mi:MI, t:T, p:P, r:R, data:_}) :-
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
 
-check_test(T) :- check_(current_predicate(T, 3)).
+% T(+F, +S.i, +O.i, -I).
+check_test(T) :- check_(current_predicate(T, 4)).
 
-check_prov(P) :- check_(current_predicate(P, 3)).
+% P(+F, +O.i, +S.i, -I).
+check_prov(P) :- check_(current_predicate(P, 4)).
 
-check_recv(R) :- check_(current_predicate(R, 3)).
+% P(+F, +S.i, +PI, -I).
+check_recv(R) :- check_(current_predicate(R, 4)).
 
 check_subject(E) :- check_entity(E).
 
