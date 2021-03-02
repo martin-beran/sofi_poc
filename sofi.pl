@@ -4,5 +4,6 @@
 
 :- reexport(integrity).
 :- reexport(entity).
+:- reexport(message).
 :- reexport(operation).
 :- reexport(util).

@@ -9,17 +9,18 @@
     acl_empty/1,
     acl_allow/3,
     acl_deny/3,
-    test_id/3,
-    prov_none/3,
-    prov_id/3,
-    recv_none/3,
-    recv_all/3
+    test_id/4,
+    prov_none/4,
+    prov_id/4,
+    recv_none/4,
+    recv_all/4
 ]).
 
 :- use_module(integrity).
 :- use_module(util).
 
-check_entity(entity{i:I, mi:MI, t:T, p:P, r:R, data:_}) :-
+check_entity(E) :-
+    check_(E = entity{i:I, mi:MI, t:T, p:P, r:R, data:_}),
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
 
@@ -43,8 +44,8 @@ check_acl(ACL) :-
     check_(is_dict(ACL)), dict_pairs(ACL, acl, A), check_acl_list(A).
 
 check_acl_list([]).
-check_acl_list([F-A|T]) :-
-    check_(atom(F)), check_acl_list2(A), check_acl_list(T).
+check_acl_list([H|T]) :-
+    check_(H = F-A), check_(atom(F)), check_acl_list2(A), check_acl_list(T).
 
 check_acl_list2([]).
 check_acl_list2([H|T]) :- check_integrity(H), check_acl_list2(T).
@@ -62,12 +63,12 @@ acl_allow(ACL1, F, ACL2) :-
 
 acl_deny(ACL1, F, ACL2) :- check_acl(ACL1), ACL2 = ACL1.put([F:[]]).
 
-test_id(_R, W, W).
+test_id(_F, _R, W, W).
 
-prov_none(_W, _R, integrity_min).
+prov_none(_F, _W, _R, integrity_min).
 
-prov_id(W, _R, W).
+prov_id(_F, W, _R, W).
 
-recv_none(_R, _W, integrity_min).
+recv_none(_F, _R, _W, integrity_min).
 
-recv_all(_R, _W, integrity_max).
+recv_all(_F, _R, _W, integrity_max).
