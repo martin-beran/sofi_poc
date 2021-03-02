@@ -15,11 +15,17 @@
 :- use_module(operation).
 :- use_module(util).
 
+% check_authority(+A)
+% Checks that A is a valid authority identifier.
 check_authority(A) :- check_(atom(A)).
 
+% check_agent(+AG)
+% Checks that AG is a valid agent specification.
 check_agent([]).
 check_agent([A|T]) :- check_authority(A), check_agent(T).
 
+% check_message(+M)
+% Checks that M is a valid message
 check_message(M) :-
     check_(is_dict(M, message)),
     dict_pairs(M, message, P),
@@ -30,6 +36,9 @@ check_message_pairs([H|T]) :-
     check_(H = A-E), check_authority(A), check_entity(E), check_(E.get(sig)),
     check_message_pairs(T).
 
+% export(+AG, +F, +E, +M, -EM)
+% Exports entity E from agent AG using function F and a stored message M,
+% yielding message EM.
 export(AG, F, E, M, EM) :-
     check_agent(AG), check_entity(E), check_message(M),
     check_(current_predicate(F/4)),
@@ -69,8 +78,12 @@ fcall(F, A, E, [K|T], EE) :-
 
 export_keys([i, mi, t, p, r, data, acl]).
 
+% export(+AG, +F, +E, -EM)
+% Exports entity E from agent AG using export function F, yielding message EM.
 export(AG, F, E, EM) :- empty_message(M), export(AG, F, E, M, EM).
 
+% import(+AG, +F, +M, +E)
+% Imports entity E from message M by agent AG using import function F.
 import(AG, F, M, E) :-
     check_agent(AG), check_message(M), check_(current_predicate(F/4)),
     export_keys(EK), import_lists(AG, F, M, EK, E),
@@ -96,4 +109,6 @@ import_list([A|AG], M, K, ILK) :-
             ILK = ILK1
     ).
 
+% empty_message(?M)
+% Creates an empty message.
 empty_message(message{}).

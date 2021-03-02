@@ -25,6 +25,7 @@
 
 :- use_module(util).
 
+% Compares integrities I1 and I2 for equality.
 I1 #== I2 :-
     check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
@@ -40,11 +41,13 @@ eq(A, B) :-
     is_list(A), is_list(B), list_to_ord_set(A, OA), list_to_ord_set(B, OB),
     ord_seteq(OA, OB).
 
+% Compares integrities I1 and I2 for inequality.
 I1 #\= I2 :-
     check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:_, ca:_}, I2 = integrity{ia:_, ca:_},
     \+ I1 #== I2.
 
+% Tests if integrity I1 is less or equal to I2.
 I1 #=< I2 :-
     check_integrity(I1), check_integrity(I2),
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
@@ -60,16 +63,22 @@ le(A, B) :-
     is_list(A), is_list(B), list_to_ord_set(A, OA), list_to_ord_set(B, OB),
     ord_subset(OA, OB).
 
+% Tests if integrity I1 is less than I2.
 I1 #< I2 :- I1 #=< I2, I1 #\= I2.
 
+% Tests if integrity I1 is greater or equal to I2.
 I1 #>= I2 :- I2 #=< I1.
 
+% Tests if integrity I1 is greater than I2.
 I1 #> I2 :- I2 #< I1.
 
+% Assigns union of integrities I1 and I2 to I.
 I #:= I1 #+ I2 :-
     I = integrity{ia:IA, ca:CA},
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
     ia_union(IA1, IA2, IA), ca_union(CA1, CA2, CA).
+
+% Assigns intersection of integrities I1 and I2 to I.
 I #:= I1 #* I2 :-
     I = integrity{ia:IA, ca:CA},
     I1 = integrity{ia:IA1, ca:CA1}, I2 = integrity{ia:IA2, ca:CA2},
@@ -103,6 +112,8 @@ a_intersection(A, B, AB) :-
     is_list(A), is_list(B), list_to_ord_set(A, OA), list_to_ord_set(B, OB),
     ord_intersection(OA, OB, AB).
 
+% check_integrity(+I)
+% Checks that I is a valid integrity.
 check_integrity(I) :-
     check_(I = integrity{ia:IA, ca:CA}),
     check_(ia_list(IA)), check_(ca_list(CA)).
@@ -113,6 +124,8 @@ ia_list(L) :- is_list(L), list_to_ord_set(L, L).
 ca_list(top_secret).
 ca_list(L) :- is_list(L), list_to_ord_set(L, L).
 
+% make_integrity(+IA, +CA, ?I)
+% Combines integrity and confidentiality attributes into an integrity.
 make_integrity(IA, CA, integrity{ia:IL, ca:CL}) :-
     make_ia_list(IA, IL), make_ca_list(CA, CL).
 
@@ -122,6 +135,8 @@ make_ia_list(IA, IL) :- is_list(IA), list_to_ord_set(IA, IL).
 make_ca_list(top_secret, top_secret).
 make_ca_list(CA, CL) :- is_list(CA), list_to_ord_set(CA, CL).
 
+% Creates a minimum integrity.
 integrity_min(integrity{ia:[], ca:top_secret}).
 
+% Creates a maximum integrity.
 integrity_max(integrity{ia:root, ca:[]}).

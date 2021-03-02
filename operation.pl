@@ -12,17 +12,25 @@
 
 f_type_r(r).
 f_type_r(rw).
+
 f_type_w(w).
 f_type_w(rw).
 
+% check_f_type(?T)
+% Checks that T is a valid operation type (read/writer/read-write)
 check_f_type(RW) :- check_(f_type_r(RW) -> true; f_type_w(RW)).
 
 f_result(allow).
 f_result(deny).
 f_result(error).
 
+% check_f_result(?R)
+% Checks that R is a valid operation result
 check_f_result(R) :- check_(f_result(R)).
 
+% f_execute(+S1, +O1, +F, +T, -S2, -O2, -R)
+% Executes operation F of type T on subject S1 and object O2, yielding subject
+% S2 and object O2, with result R.
 f_execute(S1, O1, F, T, S2, O2, R) :-
     check_subject(S1), check_object(O1),
     check_(current_predicate(F/4)), check_f_type(T),
