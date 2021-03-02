@@ -20,7 +20,7 @@
 :- use_module(util).
 
 check_entity(E) :-
-    check_(E = entity{i:I, mi:MI, t:T, p:P, r:R, data:_}),
+    check_(entity{i:I, mi:MI, t:T, p:P, r:R, data:_} :< E),
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
 

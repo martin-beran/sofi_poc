@@ -6,8 +6,10 @@
     check_message/1,
     export/5,
     export/4,
-    import/3,
-    empty_message/1
+    import/4,
+    empty_message/1,
+    f_export_unmerge/4,
+    f_import_merge/4
 ]).
 
 :- use_module(entity).
@@ -44,10 +46,10 @@ export_ag([A|T], F, E, M, EM) :-
     FCALL =.. [F, A, E, EE],
     (FCALL -> ES = EE.put(sig, valid), EM = EM1.put(A, ES); EM = EM1).
 
-export_not_ag(AG, _, _, [], []).
-export_not_ag(AG, F, E, [A:EE|T], [A:EE|EP]) :-
+export_not_ag(_, _, _, [], []).
+export_not_ag(AG, F, E, [A-EE|T], [A-EE|EP]) :-
     member(A, AG), !, export_not_ag(AG, F, E, T, EP).
-export_not_ag(AG, F, E, [A:E0|T], [A:ES|T1]) :-
+export_not_ag(AG, F, E, [A-E0|T], [A-ES|T1]) :-
     export_not_ag(AG, F, E, T, T1),
     FCALL =.. [F, A, E, EE],
     (
@@ -57,12 +59,31 @@ export_not_ag(AG, F, E, [A:E0|T], [A:ES|T1]) :-
             ES = E0
     ).
 
-export(F, E, EM) :- empty_message(M), export(AG, F, E, M, EM).
+export(AG, F, E, EM) :- empty_message(M), export(AG, F, E, M, EM).
 
-import(F, M, E) :-
+import(AG, F, M, E) :-
     check_agent(AG), check_message(M), check_(current_predicate(F/4)),
-    import_a(F, M, entity{}, E).
+    import_lists(AG, F, M, [i, mi, t, p, r, data, acl], E),
+    
+import_lists(_, _, _, [], entity{}).
+import_lists(AG, F, M, [K|T], E) :-
+    import_lists(AG, F, M, T, E1),
+    import_list(AG, M, K, VL),
+    (
+        VL = [_|_] ->
+            FCALL =.. [F, AG, K, VL, V], FCALL, E = E1.put(K, V)
+        ;
+            E = E1
+    )
 
-import_a(_, [], E, E).
+import_list([], _, _, _. []).
+import_list([A|AG], M, K, ILK) :-
+    import(list(AG, M, K, ILK1),
+    (
+        E = M.get(A), V = E.get(K), E.get(sig) = valid ->
+            ILK = [A-V|ILK1]
+        ;
+            ILK = ILK1
+    )
 
 empty_message(message{}).
