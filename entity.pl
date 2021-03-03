@@ -10,6 +10,7 @@
     acl_allow/3,
     acl_deny/3,
     test_id/4,
+    test_ok/4,
     prov_none/4,
     prov_id/4,
     recv_none/4,
@@ -83,6 +84,10 @@ acl_deny(ACL1, F, ACL2) :- check_acl(ACL1), ACL2 = ACL1.put([F:[]]).
 % test_id(+F, +R, +W, ?I)
 % Identity test integrity function
 test_id(_F, _R, W, W).
+
+% test_ok(+F, +R, +W, ?I)
+% Test integrity function that does not change reader integrity
+test_ok(_F, R, _W, R).
 
 % prov_none(+F, +W, +R, ?I)
 % Integrity providing function that provides nothing
