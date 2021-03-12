@@ -20,6 +20,8 @@
 :- use_module(integrity).
 :- use_module(util).
 
+:- meta_predicate check_test(4), check_prov(4), check_recv(4).
+
 % check_entity(+E)
 % Checks that E is a valid entity
 check_entity(E) :-
@@ -29,15 +31,15 @@ check_entity(E) :-
 
 % check_test(+T)
 % where T is T(+F, +S.i, +O.i, -I), checks that T is a valid "test" predicate
-check_test(T) :- check_(current_predicate(T, 4)).
+check_test(T) :- T = M:N, check_(current_predicate(M:N/4)).
 
 % check_prov(+P)
 % where P is P(+F, +O.i, +S.i, -I), checks that P is a valid "prov" predicate
-check_prov(P) :- check_(current_predicate(P, 4)).
+check_prov(P) :- P = M:N, check_(current_predicate(M:N/4)).
 
 % check_recv(+R)
 % where R is R(+F, +S.i, +PI, -I), checks that R is a valid "recv" predicate
-check_recv(R) :- check_(current_predicate(R, 4)).
+check_recv(R) :- R = M:N, check_(current_predicate(M:N/4)).
 
 % check_subject(+E)
 % Checks that E is a valid subject entity.

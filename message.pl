@@ -103,7 +103,7 @@ import_list([], _, _, _, []).
 import_list([A|AG], M, K, ILK) :-
     import_list(AG, M, K, ILK1),
     (
-        E = M.get(A), del_dict(sig, E, _, valid, V) ->
+        E = M.get(A), del_dict(sig, E, valid, V) ->
             ILK = [A-V|ILK1]
         ;
             ILK = ILK1
