@@ -79,7 +79,8 @@ user_ls(LS) :-
 
 % user_stat(+N)
 % Displays details about the user with name N.
-user_stat(_N).
+user_stat(N) :-
+    user(U), U.data = user(N), write_entity([name:N], U), nl, !.
 
 % user_set_integrity(+I)
 % Sets integrity of the current user. The integrity may only be made smaller.
@@ -125,7 +126,8 @@ file_ls(LS) :-
 
 % file_stat(+N)
 % Displays details about the file with name N (not applying SOFI).
-file_stat(_N).
+file_stat(N) :-
+    file(F), F.data = file(N, C), write_entity([name:N, content:C], F), nl, !.
 
 % file_create(+N)
 % Creates a new empty file with name N (not applying SOFI). The file is created

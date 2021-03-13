@@ -2,6 +2,7 @@
 
 :- module(entity, [
     check_entity/1,
+    write_entity/2,
     check_subject/1,
     check_object/1,
     check_acl/1,
@@ -28,6 +29,29 @@ check_entity(E) :-
     check_(entity{i:I, mi:MI, t:T, p:P, r:R, data:_} :< E),
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
+
+% write_entity(+D, +E)
+% Displays entity E, with wkv(D) displayed instead of E.data.
+write_entity(D, E):-
+    append(
+        D,
+        [
+            integrity:E.i, min_integrity:E.mi,
+            testing_f:E.t, providing_f:E.p, receiving_f:E.r
+        ], L),
+    wkv(L),
+    (
+        A = E.get(acl) ->
+            wnl('acl:'), dict_pairs(A, _, AL), sort(AL, S), write_acl(S)
+        ;
+            true
+    ).
+
+write_acl([]).
+write_acl([F-A|T]) :- w('    '), wnl(F), write_acl1(A), write_acl(T).
+
+write_acl1([]).
+write_acl1([H|T]) :- w('        '), wnl(H), write_acl1(T).
 
 % check_test(+T)
 % where T is T(+F, +S.i, +O.i, -I), checks that T is a valid "test" predicate
