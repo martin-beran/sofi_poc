@@ -88,6 +88,9 @@ check_acl_list([H|T]) :-
 check_acl_list2([]).
 check_acl_list2([H|T]) :- check_integrity(H), check_acl_list2(T).
 
+% test_acl(+I, +F, +ACL)
+% Tests if a subject with integrity I is allowed to perform operation
+% F according to ACL.
 test_acl(I, F, ACL) :-
     check_integrity(I), check_acl(ACL), A = ACL.get(F), test_acl2(I, A).
 

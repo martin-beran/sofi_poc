@@ -3,7 +3,7 @@
 :- module(operation, [
     check_f_type/1,
     check_f_result/1,
-    f_execute/7
+    f_execute/9
 ]).
 
 :- use_module(entity).
@@ -29,18 +29,26 @@ f_result(error).
 % Checks that R is a valid operation result
 check_f_result(R) :- check_(f_result(R)).
 
-% f_execute(+S1, +O1, +F, +T, -S2, -O2, -R)
-% Executes operation F of type T on subject S1 and object O2, yielding subject
-% S2 and object O2, with result R.
-f_execute(S1, O1, F, T, S2, O2, R) :-
+% f_test(+S, +O, +F, +T)
+% Tests if operation F of type T is allowed on subject S and object O.
+f_test(S, O, F, T) :-
+    f_test(S, O, F, T, _, _).
+
+f_test(S1, O1, F, T, SI, OI) :-
     check_subject(S1), check_object(O1),
-    check_(current_predicate(F/4)), check_f_type(T),
+    check_(current_predicate(F/6)), check_f_type(T),
+    test_acl(S1.i, F, O1.acl),
+    (f_type_r(T) -> update_r(S1, O1, F, SI); SI = S1.i), SI #>= S1.mi,
+    (f_type_w(T) -> update_w(S1, O1, F, OI); OI = O1.i), OI #>= O1.mi.
+
+% f_execute(+S1, +O1, +F, +T, -S2, -O2, -R)
+% Executes operation F of type T on subject S1, object O2, and input argument
+% AI, yielding subject S2, object O2, and output argument AO, with result R.
+f_execute(S1, O1, AI, F, T, S2, O2, AO, R) :-
     (
-        test_acl(S1.i, F, O1.acl),
-        (f_type_r(T) -> update_r(S1, O1, F, SI); SI = S1.i), SI #>= S1.mi,
-        (f_type_w(T) -> update_w(S1, O1, F, OI); OI = O1.i), OI #>= O1.mi ->
+        f_test(S1, O1, F, T, SI, OI) ->
             (
-                CALL =.. [F, S1.data, O1.data, SD, OD], CALL ->
+                CALL =.. [F, S1.data, O1.data, AI, SD, OD, AO], CALL ->
                     S2 = S1.put([i:SI, data:SD]),
                     O2 = O1.put([i:OI, data:OD]),
                     R = allow

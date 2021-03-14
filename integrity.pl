@@ -136,7 +136,7 @@ make_ca_list(top_secret, top_secret).
 make_ca_list(CA, CL) :- is_list(CA), list_to_ord_set(CA, CL).
 
 % Creates a minimum integrity.
-integrity_min(integrity{ia:[], ca:top_secret}).
+integrity_min(I) :- make_integrity([], top_secret, I).
 
 % Creates a maximum integrity.
-integrity_max(integrity{ia:root, ca:[]}).
+integrity_max(I) :- make_integrity(root, [], I).
