@@ -120,7 +120,7 @@ test_ok(_F, R, _W, R).
 
 % prov_none(+F, +W, +R, ?I)
 % Integrity providing function that provides nothing
-prov_none(_F, _W, _R, integrity_min).
+prov_none(_F, _W, _R, I) :- integrity_min(I).
 
 % prov_none(+F, +W, +R, ?I)
 % Integrity providing function that provides the integrity of the writer
@@ -128,8 +128,8 @@ prov_id(_F, W, _R, W).
 
 % recv_none(+F, +R, +W, ?I)
 % Integrity receiving function that accepts nothing
-recv_none(_F, _R, _W, integrity_min).
+recv_none(_F, _R, _W, I) :- integrity_min(I).
 
 % recv_all(+F, +R, +W, ?I)
 % Integrity receiving function that accepts anything
-recv_all(_F, _R, _W, integrity_max).
+recv_all(_F, _R, _W, I) :- integrity_max(I).

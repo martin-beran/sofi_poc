@@ -57,10 +57,20 @@ user(U) :-
 
 user(U) :-
     U = entity{
+        data: user(alice),
+        i: I, mi: MI, t: test_id, p: prov_none, r: recv_none
+    },
+    make_integrity([u_alice, g_alice, g_users], [], I),
+    integrity_min(MI),
+    check_entity(U).
+
+user(U) :-
+    U = entity{
         data: user(john),
         i: I, mi: MI, t: test_id, p: prov_none, r: recv_none
     },
-    make_integrity([u_john, g_john, g_users], [], I), integrity_min(MI),
+    make_integrity([u_john, g_john, g_users, g_project], [], I),
+    integrity_min(MI),
     check_entity(U).
 
 user(U) :-
@@ -69,7 +79,8 @@ user(U) :-
         i: I,
         mi: MI, t: test_id, p: prov_none, r: recv_none
     },
-    make_integrity([peter, g_peter, g_users], [], I), integrity_min(MI),
+    make_integrity([peter, g_peter, g_users, g_project],
+    [], I), integrity_min(MI),
     check_entity(U).
 
 % current_user_name(?N)
@@ -129,12 +140,12 @@ update_user(U) :-
 
 % op_type(?O, ?T)
 % Defines type T (read/write/read-write) of a SOFI operation O.
-op_type(read, r).
-op_type(write, w).
-op_type(swap, rw).
-op_type(get_sofi, r).
-op_type(set_integrity, w).
-op_type(set_sofi, w).
+op_type(f_read, r).
+op_type(f_write, w).
+op_type(f_swap, rw).
+op_type(f_get_sofi, r).
+op_type(f_set_integrity, w).
+op_type(f_set_sofi, w).
 
 % op_ls
 % Displays names of all defined operations.
@@ -208,7 +219,7 @@ update_file(F) :-
     assertz(file(F)).
 
 % file_read(+N, ?D)
-% Reads data D of the file with name N. This is a SOFI read operation 'read'
+% Reads data D of the file with name N. This is a SOFI read operation 'f_read'
 % with result R.
 file_read(N, D, R) :- file_sofi_op(N, _, f_read, D, R).
 
@@ -216,24 +227,24 @@ f_read(U, file(N, D), _, U, file(N, D), D).
 
 % file_write(+N, +D, ?R)
 % Writes data D to the file with name N. It fails if the file does not exist.
-% This is a SOFI write operation 'write' with result R.
-file_write(N, D, R) :- file_sofi_op(N, D, f_read, _, R).
+% This is a SOFI write operation 'f_write' with result R.
+file_write(N, D, R) :- file_sofi_op(N, D, f_write, _, R).
 
 f_write(U, file(N, _), D, U, file(N, D), _).
 
 % file_swap(+N, ?I, +O, ?R)
 % Reads data I of the file with name N and stores new data O in the file. This
-% is a SOFI read-write operation 'swap' with result R.
+% is a SOFI read-write operation 'f_swap' with result R.
 file_swap(N, I, O, R) :- file_sofi_op(N, I, f_swap, O, R).
 
 f_swap(U, file(N, D2), D1, U, file(N, D1), D2).
 
 % file_get_sofi(+N, ?A, ?R)
 % Gets SOFI attributes (the entity without data) of the file with name N. This
-% is a SOFI read operation 'get_sofi' with result R, but it does not change the
-% integrity of the current user (the reader).
+% is a SOFI read operation 'f_get_sofi' with result R, but it does not change
+% the integrity of the current user (the reader).
 file_get_sofi(N, A, R) :-
-    file_test(N, get_sofi) ->
+    file_test(N, f_get_sofi) ->
         name_file(N, _, F),  del_dict(data, F, _, A), R = allow
     ;
         R = deny.
@@ -243,8 +254,8 @@ file_get_sofi(N, A, R) :-
 % 'set_integrity' with result R, but instead of the current user integrity UI,
 % it uses UI #* I when determining the new integrity of the file.
 file_set_integrity(N, I, R) :-
-    current_user(U), IF = U.i #* I, name_file(N, _, F1),
-    test_acl(U.i, set_integrity, F1.acl), IF #>= F1.mi ->
+    current_user(U), IF #:= U.i #* I, name_file(N, _, F1),
+    test_acl(U.i, f_set_integrity, F1.acl), IF #>= F1.mi ->
         F2 = F1.put(i, I), R = allow, update_file(F2)
     ;
         R = deny.
@@ -254,8 +265,8 @@ file_set_integrity(N, I, R) :-
 % is a SOFI write operation 'set_sofi' with result R. The integrity of the file
 % is set to A.i #* UI, where UI is the integrity of the current user.
 file_set_sofi(N, A, R) :-
-    current_user(U), name_file(N, _, F1), IF = U.i #* A.i, IF #>= A.mi,
-    test_acl(U, i, set_sofi, F1.acl) ->
-        F2 = F1.put([i:IF, data:F1.data]), R = allow, update_file(F2)
+    current_user(U), name_file(N, _, F1), IF #:= U.i #* A.i, IF #>= A.mi,
+    test_acl(U.i, f_set_sofi, F1.acl) ->
+        F2 = A.put([i:IF, data:F1.data]), R = allow, update_file(F2)
     ;
         R = deny.
