@@ -20,6 +20,8 @@
     check_integrity/1,
     make_integrity/3,
     integrity_min/1,
+    integrity_min_public/1,
+    integrity_max_secret/1,
     integrity_max/1
 ]).
 
@@ -129,14 +131,24 @@ ca_list(L) :- is_list(L), list_to_ord_set(L, L).
 make_integrity(IA, CA, integrity{ia:IL, ca:CL}) :-
     make_ia_list(IA, IL), make_ca_list(CA, CL).
 
-make_ia_list(root, root).
+make_ia_list(root, root) :- !.
 make_ia_list(IA, IL) :- is_list(IA), list_to_ord_set(IA, IL).
 
-make_ca_list(top_secret, top_secret).
+make_ca_list(top_secret, top_secret) :- !.
 make_ca_list(CA, CL) :- is_list(CA), list_to_ord_set(CA, CL).
 
+% integrity_min(?I)
 % Creates a minimum integrity.
 integrity_min(I) :- make_integrity([], top_secret, I).
 
+% integrity_public(?I)
+% Creates a mimimum integrity that is not confidential.
+integrity_min_public(I) :- make_integrity([], [], I).
+
+% integrity_max_secret(?I)
+% Creates a maximum integrity that is top-secret.
+integrity_max_secret(I) :- make_integrity(root, top_secret, I).
+
+% integrity_max(?I)
 % Creates a maximum integrity.
 integrity_max(I) :- make_integrity(root, [], I).
