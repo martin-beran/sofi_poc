@@ -2,7 +2,8 @@
 
 :- module(examples_www, [
     server/3,
-    init_browser/0
+    init_browser/0,
+    browser_stat/0
 ]).
 
 :- use_module(sofi).
@@ -39,6 +40,8 @@ make_acl([O|T], I, A) :- make_acl(T, I, A0), A = A0.put(O, [I]).
 % subject. R is a list of resources, each being a SOFI object.
 :- dynamic browser/2.
 
+% init_browser
+% Initialize the browser.
 init_browser :-
     E = entity{
         data: "",
@@ -49,3 +52,16 @@ init_browser :-
 
 update_browser(P, R) :-
     retractall(browser(_, _)), assertz(browser(P, R)).
+
+browser_stat :-
+    browser(P, R),
+    wnl('%%% Page %%%'),
+    write_entity(P),
+    write_resources(R, 0).
+
+write_resources([], _).
+write_resources([R|T], I) :-
+    w('%%% Resource '), w(I), wnl(' %%%'),
+    write_entity(R),
+    I1 is I + 1,
+    write_resources(T, I1).

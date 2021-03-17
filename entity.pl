@@ -2,6 +2,7 @@
 
 :- module(entity, [
     check_entity/1,
+    write_entity/1,
     write_entity/2,
     check_subject/1,
     check_object/1,
@@ -29,6 +30,10 @@ check_entity(E) :-
     check_(entity{i:I, mi:MI, t:T, p:P, r:R, data:_} :< E),
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
+
+% write_entity(+D, +E)
+% Displays entity E.
+write_entity(E):- write_entity([data:E.data], E).
 
 % write_entity(+D, +E)
 % Displays entity E, with wkv(D) displayed instead of E.data.

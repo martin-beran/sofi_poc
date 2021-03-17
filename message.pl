@@ -15,6 +15,8 @@
 :- use_module(operation).
 :- use_module(util).
 
+:- meta_predicate export(?, 4, ?, ?, ?), export(?, 4, ?, ?), import(?, 4, ?, ?).
+
 % check_authority(+A)
 % Checks that A is a valid authority identifier.
 check_authority(A) :- check_(atom(A)).
@@ -41,7 +43,7 @@ check_message_pairs([H|T]) :-
 % yielding message EM.
 export(AG, F, E, M, EM) :-
     check_agent(AG), check_entity(E), check_message(M),
-    check_(current_predicate(F/4)),
+    F = FM:FN, check_(current_predicate(FM:FN/4)),
     export_ag(AG, F, E, M, EA),
     dict_pairs(EA, message, P),
     export_not_ag(AG, F, E, P, EP),
@@ -74,7 +76,7 @@ export_not_ag(AG, F, E, [A-E0|T], [A-ES|T1]) :-
 fcall(_, _, _, [], entity{}).
 fcall(F, A, E, [K|T], EE) :-
     fcall(F, A, E, T, EE1),
-    FCALL =.. [F, A, E, K, V], FCALL, EE = EE1.put(K, V).
+    F = M:N, FCALL =.. [N, A, E, K, V], M:FCALL, EE = EE1.put(K, V).
 
 export_keys([i, mi, t, p, r, data, acl]).
 
@@ -85,7 +87,8 @@ export(AG, F, E, EM) :- empty_message(M), export(AG, F, E, M, EM).
 % import(+AG, +F, +M, +E)
 % Imports entity E from message M by agent AG using import function F.
 import(AG, F, M, E) :-
-    check_agent(AG), check_message(M), check_(current_predicate(F/4)),
+    check_agent(AG), check_message(M),
+    F = FM:FN, check_(current_predicate(FM:FN/4)),
     export_keys(EK), import_lists(AG, F, M, EK, E),
     
 import_lists(_, _, _, [], entity{}).
@@ -94,7 +97,7 @@ import_lists(AG, F, M, [K|T], E) :-
     import_list(AG, M, K, VL),
     (
         VL = [_|_] ->
-            FCALL =.. [F, AG, K, VL, V], FCALL, E = E1.put(K, V)
+            F = FM:FN, FCALL =.. [FN, AG, K, VL, V], FM:FCALL, E = E1.put(K, V)
         ;
             E = E1
     ).
