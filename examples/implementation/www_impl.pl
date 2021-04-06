@@ -8,7 +8,7 @@
     browser_load/3
 ]).
 
-:- use_module(sofi).
+:- use_module('../../sofi').
 
 % op_type(?O, ?T)
 % Defines type T (read/write/read-write) of a SOFI operation O.

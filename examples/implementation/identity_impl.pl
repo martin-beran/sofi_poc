@@ -3,4 +3,4 @@
 :- module(examples_www, [
 ]).
 
-:- use_module(sofi).
+:- use_module('../../sofi').

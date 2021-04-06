@@ -26,7 +26,7 @@
     file_set_sofi/3
 ]).
 
-:- use_module(sofi).
+:- use_module('../../sofi').
 
 % Available users
 % User U is an subject with U.data = user(Name).
