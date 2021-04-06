@@ -31,7 +31,7 @@ check_entity(E) :-
     check_integrity(I), check_integrity(MI),
     check_test(T), check_prov(P), check_recv(R).
 
-% write_entity(+D, +E)
+% write_entity(+E)
 % Displays entity E.
 write_entity(E):- write_entity([data:E.data], E).
 
