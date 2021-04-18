@@ -42,9 +42,10 @@ f_test(S1, O1, F, T, SI, OI) :-
     (f_type_r(T) -> update_r(S1, O1, F, SI); SI = S1.i), SI #>= S1.mi,
     (f_type_w(T) -> update_w(S1, O1, F, OI); OI = O1.i), OI #>= O1.mi.
 
-% f_execute(+S1, +O1, +F, +T, -S2, -O2, -R)
+    % f_execute(+S1, +O1, +AI, +F, +T, ?S2, ?O2, ?AO, ?R)
 % Executes operation F of type T on subject S1, object O2, and input argument
 % AI, yielding subject S2, object O2, and output argument AO, with result R.
+% The operation is F(+S1.data, +O1.data, +AI, ?S2.data, ?O2.data, ?AO).
 f_execute(S1, O1, AI, F, T, S2, O2, AO, R) :-
     F = M:N, check_(current_predicate(M:N/6)),
     (
